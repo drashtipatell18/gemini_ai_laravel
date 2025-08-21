@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
         integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
@@ -72,23 +74,24 @@
             </a>
         </div>
         <form id="loginForm" class="space-y-5">
-           <!-- Email Field -->
-<div>
-    <label class="block text-sm font-medium text-[--textarea-text] mb-1" for="email">Email</label>
-    <input type="email" id="email" name="email"
-        class="w-full px-4 py-2 border text-[--textarea-text] bg-[--input-bg] rounded-lg focus:outline-none focus:ring-2 focus:ring-[--input-border-focus]" />
-    <p id="emailError" class="text-red-500 text-xs mt-1 hidden">Invalid email</p>
-</div>
+            <!-- Email Field -->
+            <div>
+                <label class="block text-sm font-medium text-[--textarea-text] mb-1" for="email">Email</label>
+                <input type="email" id="email" name="email"
+                    class="w-full px-4 py-2 border text-[--textarea-text] bg-[--input-bg] rounded-lg focus:outline-none focus:ring-2 focus:ring-[--input-border-focus]" />
+                <p id="emailError" class="text-red-500 text-xs mt-1 hidden">Invalid email</p>
+            </div>
 
-<!-- Password Field -->
-<div class="relative">
-    <label class="block text-sm font-medium text-[--textarea-text] mb-1" for="password">Password</label>
-    <input type="password" id="password" name="password"
-        class="w-full px-4 py-2 border text-[--textarea-text] bg-[--input-bg] rounded-lg focus:outline-none focus:ring-2 focus:ring-[--input-border-focus]" />
-    <span id="togglePassword"
-        class="absolute right-3 material-symbols-outlined top-[38px] text-[--add-btn] cursor-pointer select-none">visibility</span>
-    <p id="passwordError" class="text-red-500 text-xs mt-1 hidden">Password must be at least 6 characters</p>
-</div>
+            <!-- Password Field -->
+            <div class="relative">
+                <label class="block text-sm font-medium text-[--textarea-text] mb-1" for="password">Password</label>
+                <input type="password" id="password" name="password"
+                    class="w-full px-4 py-2 border text-[--textarea-text] bg-[--input-bg] rounded-lg focus:outline-none focus:ring-2 focus:ring-[--input-border-focus]" />
+                <span id="togglePassword"
+                    class="absolute right-3 material-symbols-outlined top-[38px] text-[--add-btn] cursor-pointer select-none">visibility</span>
+                <p id="passwordError" class="text-red-500 text-xs mt-1 hidden">Password must be at least 6 characters
+                </p>
+            </div>
 
 
             <div class="text-right mt-1">
@@ -155,11 +158,11 @@
 
         const savedAccounts = JSON.parse(localStorage.getItem('accounts')) || [];
 
-if (savedAccounts.length > 0) {
-    const container = document.getElementById('accountList');
+        if (savedAccounts.length > 0) {
+            const container = document.getElementById('accountList');
 
-    container.innerHTML = savedAccounts.map(acc => `
-        <div onclick="switchAccount('${acc.email}')" 
+            container.innerHTML = savedAccounts.map(acc => `
+        <div onclick="switchAccount('${acc.email}')"
             class="p-3 truncate cursor-pointer hover:bg-gray-100 rounded flex items-center gap-2 border">
             <div class="w-[36px] h-[36px] bg-blue-400 rounded-full text-white flex items-center justify-center font-bold">
                 ${acc.name.charAt(0).toUpperCase()}
@@ -170,23 +173,21 @@ if (savedAccounts.length > 0) {
             </div>
         </div>
     `).join('');
-}
+        }
 
 
-function switchAccount(email) {
-    const accounts = JSON.parse(localStorage.getItem('accounts')) || [];
-    const user = accounts.find(acc => acc.email === email);
+        function switchAccount(email) {
+            const accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+            const user = accounts.find(acc => acc.email === email);
 
-    if (user) {
-        localStorage.setItem('login', JSON.stringify(user));
-        window.location.href = 'Yoyo.html'; // redirect to app
-    }
-}
-
-
+            if (user) {
+                localStorage.setItem('login', JSON.stringify(user));
+                window.location.href = '/'; // redirect to app
+            }
+        }
     </script>
 
-    <script src="./JS/Login.js"></script>
+    <script src="{{ asset('JS/Login.js')}}"></script>
 </body>
 
 </html>

@@ -72,7 +72,7 @@
                 </span>
             </a>
         </div>
-        <form id="signInForm" class="space-y-5" action="{{ route('signupStore') }}" method="POST">
+        <form id="signInForm" class="space-y-5"method="POST">
             @csrf
 
             <!-- Name Field -->

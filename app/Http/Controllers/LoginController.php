@@ -1,10 +1,9 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class LoginController extends Controller
@@ -13,48 +12,104 @@ class LoginController extends Controller
         return view('login');
     }
 
-    // public function LoginStore(Request $request)
-    // {
-    //     // First check if user exists
-    //     $user = User::where('email', $request->email)->first();
+    public function LoginStore(Request $request)
+    {
+        // Validate request data
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required|min:6',
+        ]);
 
-    //     if (!$user) {
-    //         return back()->withErrors([
-    //             'email' => 'No account found with this email address',
-    //         ])->onlyInput('email');
-    //     }
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
 
-    //     // Then check password
-    //     if (!Hash::check($request->password, $user->password)) {
-    //         return back()->withErrors([
-    //             'password' => 'The password you entered is incorrect',
-    //         ])->onlyInput('email');
-    //     }
+        // Check if user exists
+        $user = User::where('email', $request->email)->first();
 
-    //     // If we get here, credentials are valid
-    //     $auth = Auth::login($user);
-    //     $request->session()->regenerate();
+        if (!$user) {
+            return response()->json([
+                'message' => 'Login failed',
+                'errors' => [
+                    'email' => ['No account found with this email address']
+                ]
+            ], 422);
+        }
 
-    //     return redirect()->intended('dashboard')->with('success', 'Login successful!')->with('auth', $auth);
-    // }
+        // Check password
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'message' => 'Login failed',
+                'errors' => [
+                    'password' => ['The password you entered is incorrect']
+                ]
+            ], 422);
+        }
+
+        // Login successful
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        return response()->json([
+            'message' => 'Login successful',
+            'redirect_url' => url('/')
+        ], 200);
+    }
 
     public function Signup(){
-        return view('Signup');
+        return view('signup');
     }
 
     public function SignupStore(Request $request)
     {
-       
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+        // Validate request data
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|min:3|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:6|max:255',
         ]);
 
-        auth()->login($user);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
 
-        // Redirect to dashboard or intended page
-        return response()->json(['message' => 'User registered successfully']);
+        try {
+            // Create new user
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+
+            // Auto-login the user
+            Auth::login($user);
+            $request->session()->regenerate();
+
+            return response()->json([
+                'message' => 'User registered successfully',
+                'redirect_url' => url('/login')
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Registration failed. Please try again.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
+    public function Logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login')->with('success', 'You have been logged out successfully.');
+    }
 }

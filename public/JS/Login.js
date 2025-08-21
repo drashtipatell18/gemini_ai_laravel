@@ -1,22 +1,23 @@
+// Get base URL from meta tag or current location
+const getBaseUrl = () => {
+    const metaBaseUrl = document.querySelector('meta[name="base-url"]');
+    return metaBaseUrl ? metaBaseUrl.getAttribute('content') : window.location.origin;
+};
 
-const urlParams = new URLSearchParams(window.location.search);
-const isAddAccount = urlParams.get('add'); // check for add flag
-
-const alreadyLoggedIn = JSON.parse(localStorage.getItem('login'));
-
-if (alreadyLoggedIn && !isAddAccount) {
-    window.location.href = 'Yoyo.html'; // redirect ONLY if not adding account
-}
-
+// Get CSRF token
+const getCsrfToken = () => {
+    const metaCsrf = document.querySelector('meta[name="csrf-token"]');
+    return metaCsrf ? metaCsrf.getAttribute('content') : '';
+};
 
 document.getElementById('togglePassword').addEventListener('click', function () {
     const password = document.getElementById('password');
-    const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-    password.setAttribute('type', type);
+    const type = password.type === 'password' ? 'text' : 'password';
+    password.type = type;
     this.textContent = type === 'password' ? 'visibility' : 'visibility_off';
 });
 
-document.getElementById('loginForm').addEventListener('submit', async function (e) {
+document.getElementById('loginForm').addEventListener('submit', function (e) {
     e.preventDefault();
 
     const email = document.getElementById('email');
@@ -24,14 +25,15 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     const emailError = document.getElementById('emailError');
     const passwordError = document.getElementById('passwordError');
 
-    let isValid = true;
-
-    // Reset error visibility
+    // Reset error messages
     emailError.classList.add('hidden');
     passwordError.classList.add('hidden');
 
+    let isValid = true;
+
     // Email validation
-    if (!email.value || !email.value.includes('@') || !email.value.includes('.')) {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email.value.trim())) {
         emailError.textContent = 'Please enter a valid email.';
         emailError.classList.remove('hidden');
         isValid = false;
@@ -39,50 +41,62 @@ document.getElementById('loginForm').addEventListener('submit', async function (
 
     // Password validation
     if (!password.value) {
-        passwordError.textContent = 'Please enter a valid password.'
-        passwordError.classList.remove('hidden');
-        isValid = false;
-    } else if (password.value.length < 6) {
-        passwordError.textContent = 'Password must be at least 6 characters.';
+        passwordError.textContent = 'Please enter a password.';
         passwordError.classList.remove('hidden');
         isValid = false;
     }
 
     if (!isValid) return;
 
-    try {
-        const response = await fetch('http://localhost:8080/signinData');
-        const data = await response.json();
+    // Show loading state
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Signing In...';
+    submitBtn.disabled = true;
 
-        const user = data.find(v => v.email === email.value && v.password === password.value);
-
-        if (user) {
-            let existingAccounts = JSON.parse(localStorage.getItem('accounts')) || [];
-
-            // Add only if email not exists already
-            if (!existingAccounts.some(acc => acc.email === user.email)) {
-                existingAccounts.push(user);
-                localStorage.setItem('accounts', JSON.stringify(existingAccounts));
+    // Submit login request
+    fetch(`${getBaseUrl()}/loginStore`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': getCsrfToken(),
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email.value.trim(),
+                password: password.value
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => Promise.reject(err));
             }
+            return response.json();
+        })
+        .then(data => {
+            // Success - redirect to dashboard
+            window.location.href = `${getBaseUrl()}`;
+        })
+        .catch(error => {
+            console.error('Error:', error);
 
-            localStorage.setItem('login', JSON.stringify(user));
-            window.location.href = 'Yoyo.html';
-        } else {
-            alert('Invalid email or password');
-        }
+            // Reset button state
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
 
-
-    } catch (error) {
-        console.log('Login Error:', error);
-        alert('Something went wrong. Please try again later.');
-    }
+            // Handle validation errors from server
+            if (error.errors) {
+                if (error.errors.email) {
+                    emailError.textContent = error.errors.email[0];
+                    emailError.classList.remove('hidden');
+                }
+                if (error.errors.password) {
+                    passwordError.textContent = error.errors.password[0];
+                    passwordError.classList.remove('hidden');
+                }
+            } else {
+                alert('Login failed. Please check your credentials and try again.');
+            }
+        });
 });
 
-function switchAccount(email) {
-    const allAccounts = JSON.parse(localStorage.getItem('accounts')) || [];
-    const user = allAccounts.find(acc => acc.email === email);
-    if (user) {
-        localStorage.setItem('login', JSON.stringify(user));
-        window.location.href = 'Yoyo.html';
-    }
-}

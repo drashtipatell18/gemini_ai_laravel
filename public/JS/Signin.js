@@ -1,3 +1,15 @@
+// Get base URL from meta tag or current location
+const getBaseUrl = () => {
+    const metaBaseUrl = document.querySelector('meta[name="base-url"]');
+    return metaBaseUrl ? metaBaseUrl.getAttribute('content') : window.location.origin;
+};
+
+// Get CSRF token
+const getCsrfToken = () => {
+    const metaCsrf = document.querySelector('meta[name="csrf-token"]');
+    return metaCsrf ? metaCsrf.getAttribute('content') : '';
+};
+
 document.getElementById('togglePassword').addEventListener('click', function () {
     const password = document.getElementById('password');
     const type = password.type === 'password' ? 'text' : 'password';
@@ -44,7 +56,6 @@ document.getElementById('signInForm').addEventListener('submit', function (e) {
         isValid = false;
     }
 
-
     // Email validation
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email.value.trim())) {
@@ -64,8 +75,6 @@ document.getElementById('signInForm').addEventListener('submit', function (e) {
         isValid = false;
     }
 
-
-
     // Confirm password match
     if (password.value !== confirmPassword.value) {
         confirmError.textContent = 'Passwords do not match.';
@@ -75,46 +84,59 @@ document.getElementById('signInForm').addEventListener('submit', function (e) {
 
     if (!isValid) return;
 
+    // Show loading state
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Creating Account...';
+    submitBtn.disabled = true;
+
     // Submit if all valid
-        fetch('http://127.0.0.1:8000/signupStore', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify({
-                name: name.value,
-                email: email.value,
-                password: password.value
-            })
+    fetch(`${getBaseUrl()}/signupStore`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': getCsrfToken(),
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            name: name.value.trim(),
+            email: email.value.trim(),
+            password: password.value
         })
-        .then(() => {
-            const newUser = {
-                name: name.value,
-                email: email.value,
-                password: password.value // Include this so it works with login.js
-            };
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => Promise.reject(err));
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Success - redirect to dashboard or home
+        window.location.href = `${getBaseUrl()}/login`;
+    })
+    .catch(error => {
+        console.error('Error:', error);
 
-            localStorage.setItem('login', JSON.stringify(newUser));
+        // Reset button state
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
 
-            let existingAccounts = JSON.parse(localStorage.getItem('accounts')) || [];
-
-            // Add only if email doesn't already exist
-            if (!existingAccounts.some(acc => acc.email === newUser.email)) {
-                existingAccounts.push(newUser);
-                localStorage.setItem('accounts', JSON.stringify(existingAccounts));
+        // Handle validation errors from server
+        if (error.errors) {
+            if (error.errors.name) {
+                nameError.textContent = error.errors.name[0];
+                nameError.classList.remove('hidden');
             }
-
-            window.location.href = '/';
-
-
-
-            
-
-        })
-
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Failed to save. Try again.');
-        });
+            if (error.errors.email) {
+                emailError.textContent = error.errors.email[0];
+                emailError.classList.remove('hidden');
+            }
+            if (error.errors.password) {
+                passwordError.textContent = error.errors.password[0];
+                passwordError.classList.remove('hidden');
+            }
+        } else {
+            alert('Failed to create account. Please try again.');
+        }
+    });
 });

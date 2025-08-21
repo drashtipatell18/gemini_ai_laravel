@@ -19,11 +19,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{{ asset('css/Yoyo.css') }}">
     <link rel="stylesheet" href="{{ asset('css/SavedInfo.css') }}">
-    
+
 </head>
 
 <body>
-<script src="{{ asset('JS/Gemini.js') }}"></script>
+    <script src="{{ asset('JS/Gemini.js') }}"></script>
     <script>
         const feedback_message = document.getElementById("feedback_message");
         const sendBtn = document.getElementById("sendBtn");
@@ -38,7 +38,7 @@
             feedback_data.classList.add('hidden')
         );
 
-        feedback_message.addEventListener("input", function () {
+        feedback_message.addEventListener("input", function() {
             if (feedback_message.value.trim().length > 0) {
                 sendBtn.disabled = false;
                 sendBtn.classList.remove("bg-[#373737]", "text-white");
@@ -56,9 +56,9 @@
     <!-- -----------Profile JS---------------- -->
 
     <script>
-        const accountData = JSON.parse(localStorage.getItem('login'))
+        const accountData = JSON.parse(localStorage.getItem('user'))
 
-        console.log(accountData);
+        // console.log(accountData);
 
         const allAccounts = JSON.parse(localStorage.getItem('accounts')) || [];
 
@@ -70,9 +70,9 @@
                 return `
         <div onclick="switchAccount('${acc.email}')"
             class="flex items-center gap-3 p-4 h-[60px] sm:p-3 cursor-pointer bg-[--bg-main] hover:bg-[var(--sidebar-hover)] ">
-            <div class="w-[36px] h-[36px]  bg-[#78909c] text-white flex items-center justify-center rounded-full font-semibold text-lg">
-                ${acc.name.charAt(0).toUpperCase()}
-            </div>
+           <div class="w-[36px] h-[36px] bg-[#78909c] text-white flex items-center justify-center rounded-full font-semibold text-lg">
+        ${acc.name ? acc.name.charAt(0).toUpperCase() : (acc.email ? acc.email.charAt(0).toUpperCase() : 'U')}
+    </div>
             <div class="text-left truncate overflow-hidden w-[175px] sm:w-auto">
                 <div class="text-sm font-medium text-[var(--text-main)]">${acc.name}</div>
                 <div class="text-xs text-[var(--text-muted)] truncate overflow-hidden whitespace-nowrap ">${acc.email}</div>
@@ -84,6 +84,7 @@
 
 
         if (accountData) {
+
             document.getElementById('account').innerHTML =
 
 
@@ -91,25 +92,25 @@
                     <div class="relative group inline-block">
                         <button id="profile-button"
                         class="w-8 h-8 bg-[#78909c] rounded-full flex items-center justify-center text-white font-medium">
-                        ${accountData.name.charAt(0).toUpperCase()}
+                        ${accountData.user.name.charAt(0).toUpperCase()}
                         </button>
 
                         <div id='account-tooltips' class="absolute z-[999] right-0 mt-1 min-w-56 p-2 bg-[#3c4043e6] hidden group-hover:block rounded">
                         <h5 class="text-[13px] text-[#E8EAED] font-medium m-0">Google Account</h5>
-                        <p class="text-[13px] text-[#9AA0A6] font-medium m-0">${accountData.name}</p>
-                        <p class="text-[13px] text-[#9AA0A6] font-medium m-0">${accountData.email}</p>
+                        <p class="text-[13px] text-[#9AA0A6] font-medium m-0">${accountData.user.name}</p>
+                        <p class="text-[13px] text-[#9AA0A6] font-medium m-0">${accountData.user.email}</p>
                         </div>
                     </div>
 
                     <div id="profile-dropdown"
                         class="absolute right-4 top-14 w-[400px] max-w-[90vw] sm:max-w-md rounded-3xl shadow-xl z-50 overflow-hidden"
                         style="background-color: var(--dropdown-bg); color: var(--dropdown-text);">
-                        
+
                         <!-- Header -->
                        <div class="flex items-center relative px-4 pt-5 pb-2">
                             <div class="flex-1 text-center text-sm font-medium truncate px-2 max-w-[90%]"
                                 style="color: var(--dropdown-text); ">
-                                ${accountData.email}
+                                ${accountData.user.email}
                             </div>
                             <button id="profile-close"
                                 class="text-lg absolute top-[14px] right-[6px] hover:bg-[var(--sidebar-hover)] w-[36px] h-[36px] rounded-full font-medium text-[var(--text-muted)]">
@@ -124,7 +125,7 @@
                         <div class="relative">
                             <div id="profile-circle"
                             class="w-[75px] h-[75px] bg-[#78909c] rounded-full flex items-center justify-center text-white text-4xl font-medium mb-2 overflow-hidden cursor-pointer">
-                            ${accountData.name.charAt(0).toUpperCase()}
+                            ${accountData.user.name.charAt(0).toUpperCase()}
                             </div>
                             <input type="file" id="profile-img-upload" accept="image/*" class="hidden" />
                             <div class="w-6 h-6 bottom-[4px] left-[53px] absolute rounded-full items-center justify-center flex pointer-events-none"
@@ -138,62 +139,62 @@
                         </div>
 
                         <div class="text-center mt-2">
-                            <div class="font-medium text-base sm:text-xl">Hi, ${accountData.name}</div>
+                            <div class="font-medium text-base sm:text-xl">Hi, ${accountData.user.name}</div>
                             <button class="text-sm mt-2 py-2 font-semibold border rounded-full px-5"
                             style="color: var(--accent-blue); border-color: var(--border-color);">Manage your Google Account</button>
                         </div>
                         </div>
 
-                        
+
                         <!-- Add & Sign Out -->
 
                         ${accountsList ? `
-                             <!-- Other Accounts (Toggleable) -->
-                                <div class="flex flex-col gap-1 mt-3 mb-3 m-3 ">
-                                        <button id="toggleAccountsBtn" class="w-full   flex justify-between items-center px-4 py-4 bg-[--bg-main] hover:bg-[--account-hover] transition rounded-t-3xl rounded-b-3xl">
-                                            <span id="toggleText" class="text-base sm:text-base">Show more accounts</span>
-                                            <i id="iconExpand" class="fa-solid fa-chevron-down transition-transform duration-300"></i>
-                                        </button>
+                                 <!-- Other Accounts (Toggleable) -->
+                                    <div class="flex flex-col gap-1 mt-3 mb-3 m-3 ">
+                                            <button id="toggleAccountsBtn" class="w-full   flex justify-between items-center px-4 py-4 bg-[--bg-main] hover:bg-[--account-hover] transition rounded-t-3xl rounded-b-3xl">
+                                                <span id="toggleText" class="text-base sm:text-base">Show more accounts</span>
+                                                <i id="iconExpand" class="fa-solid fa-chevron-down transition-transform duration-300"></i>
+                                            </button>
 
 
-                                        <div id="accountList" class="hidden  flex flex-col gap-1 ">
-                                            ${accountsList}
+                                            <div id="accountList" class="hidden  flex flex-col gap-1 ">
+                                                ${accountsList}
 
-                                            <div onclick="handleRedirectLogin()" class="px-4 h-[60px] py-4 flex items-center text-sm justify-start  bg-[--bg-main] hover:bg-[--account-hover] cursor-pointer ">
-                                                <div class="w-6 h-6 rounded-full flex items-center justify-center mr-2" style="background-color: var(--sidebar-hover);">
-                                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="var(--accent-blue)">
-                                                    <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z" />
-                                                </svg>
+                                                <div onclick="handleRedirectLogin()" class="px-4 h-[60px] py-4 flex items-center text-sm justify-start  bg-[--bg-main] hover:bg-[--account-hover] cursor-pointer ">
+                                                    <div class="w-6 h-6 rounded-full flex items-center justify-center mr-2" style="background-color: var(--sidebar-hover);">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="var(--accent-blue)">
+                                                        <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z" />
+                                                    </svg>
+                                                    </div>
+                                                    Add account
                                                 </div>
-                                                Add account
-                                            </div>
 
-                                        <div onclick="signOutAllAccounts()" class="px-4 h-[60px] py-4 flex items-center text-sm justify-start rounded-b-3xl  bg-[--bg-main] hover:bg-[--account-hover] cursor-pointer ">
-                                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" class="mr-2" width="24px" fill="currentColor">
-                                            <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z" />
-                                            </svg>
-                                            Sign out of all accounts
-                                        </div>
-                                        </div>
-                                </div> `
+                                            <div onclick="signOutAllAccounts()" class="px-4 h-[60px] py-4 flex items-center text-sm justify-start rounded-b-3xl  bg-[--bg-main] hover:bg-[--account-hover] cursor-pointer ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" class="mr-2" width="24px" fill="currentColor">
+                                                <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z" />
+                                                </svg>
+                                                Sign out of all accounts
+                                            </div>
+                                            </div>
+                                    </div> `
                     :
                     `
-                             <div class="flex justify-center items-center gap-[2px] px-4">
-                                <div onclick="handleRedirectLogin()" class="px-4 h-[60px] py-4 flex items-center text-sm justify-start rounded-s-full bg-[--bg-main] hover:bg-[--account-hover] cursor-pointer w-[50%]">
-                                    <div class="w-6 h-6 rounded-full flex items-center justify-center mr-2" style="background-color: var(--sidebar-hover);">
-                                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="var(--accent-blue)">
-                                        <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z" />
-                                    </svg>
+                                 <div class="flex justify-center items-center gap-[2px] px-4">
+                                    <div onclick="handleRedirectLogin()" class="px-4 h-[60px] py-4 flex items-center text-sm justify-start rounded-s-full bg-[--bg-main] hover:bg-[--account-hover] cursor-pointer w-[50%]">
+                                        <div class="w-6 h-6 rounded-full flex items-center justify-center mr-2" style="background-color: var(--sidebar-hover);">
+                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="var(--accent-blue)">
+                                            <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z" />
+                                        </svg>
+                                        </div>
+                                        Add account
                                     </div>
-                                    Add account
-                                </div>
-                                <div onclick="handleRemoveLogin()" class="px-4 h-[60px] py-4 flex items-center text-sm justify-start rounded-e-full bg-[--bg-main] hover:bg-[--account-hover] cursor-pointer w-[50%]">
-                                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" class="mr-2" width="24px" fill="currentColor">
-                                    <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z" />
-                                    </svg>
-                                    Sign out
-                                </div>
-                        </div>`
+                                    <div onclick="handleRemoveLogin()" class="px-4 h-[60px] py-4 flex items-center text-sm justify-start rounded-e-full bg-[--bg-main] hover:bg-[--account-hover] cursor-pointer w-[50%]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" class="mr-2" width="24px" fill="currentColor">
+                                        <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z" />
+                                        </svg>
+                                        Sign out
+                                    </div>
+                            </div>`
                 }
 
                         <!-- Footer -->
@@ -208,9 +209,9 @@
             document.getElementById('yoyo-user-name').innerHTML = `
                              <h1
                                 class="text-3xl bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">
-                                
-                                Hello, ${accountData.name.split(" ")[0]}
-                               
+
+                                Hello, ${accountData.user.name.split(" ")[0]}
+
                             </h1>
 
                     `
@@ -221,8 +222,8 @@
         } else {
 
             document.getElementById('account').innerHTML = `
-        <button 
-            class="bg-[--add-btn] text-[--add-btn-text] font-bold py-2 px-4 rounded-lg" 
+        <button
+            class="bg-[--add-btn] text-[--add-btn-text] font-bold py-2 px-4 rounded-lg"
             onclick="handleRedirectLogin()">
             Login
         </button>`;
@@ -241,14 +242,14 @@
         }
 
         function handleRedirectLogin() {
-            window.location.href = '{{ route('login') }}';  // set flag
+            window.location.href = '{{ route('login') }}'; // set flag
         }
 
 
         function signOutAllAccounts() {
             localStorage.removeItem('login');
             localStorage.removeItem('accounts');
-            window.location.href = 'login.html?add=true'; // or wherever your login page is
+            window.location.href = '/login'; // or wherever your login page is
         }
 
 
@@ -267,11 +268,11 @@
             if (accounts.length > 0) {
                 const nextUser = accounts[0]; // First saved user
                 localStorage.setItem('login', JSON.stringify(nextUser));
-                window.location.href = 'Yoyo.html'; // Auto redirect to app
+                window.location.href = '/'; // Auto redirect to app
             } else {
                 // No user left, go to login page
                 localStorage.removeItem('login');
-                window.location.href = '{{ route('login') }}';
+                window.location.href = '/login';
             }
         }
 
@@ -294,20 +295,15 @@
             const current = JSON.parse(localStorage.getItem('login'));
             if (current && current.email === email) {
                 localStorage.removeItem('login');
-                window.location.href = 'login.html';
+                window.location.href = '/login';
             } else {
                 window.location.reload();
             }
         }
-
-
-
-
     </script>
-   
+
 
     <script>
-
         // Put this at the TOP of your Gemini.js file, before DOMContentLoaded
         function checkForGuideline() {
             // Try localStorage first
@@ -347,10 +343,10 @@
         checkForGuideline();
 
         // Then continue with your existing DOMContentLoaded code...
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             // Your existing initialization code...
         });
-
     </script>
 </body>
+
 </html>

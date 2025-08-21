@@ -53,10 +53,12 @@ class LoginController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return response()->json([
+      return response()->json([
             'message' => 'Login successful',
-            'redirect_url' => url('/')
-        ], 200);
+            'redirect_url' => url('/'),
+            'user' => $user,
+      ], 200);
+
     }
 
     public function Signup(){

@@ -241,7 +241,7 @@
         }
 
         function handleRedirectLogin() {
-            window.location.href = 'login.html?add=true';  // set flag
+            window.location.href = '{{ route('login') }}';  // set flag
         }
 
 
@@ -271,7 +271,7 @@
             } else {
                 // No user left, go to login page
                 localStorage.removeItem('login');
-                window.location.href = 'login.html';
+                window.location.href = '{{ route('login') }}';
             }
         }
 

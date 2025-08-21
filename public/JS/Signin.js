@@ -76,11 +76,12 @@ document.getElementById('signInForm').addEventListener('submit', function (e) {
     if (!isValid) return;
 
     // Submit if all valid
-    fetch('http://localhost:8080/signinData', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+   fetch('http://127.0.0.1:8000/signupStore', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+  
         body: JSON.stringify({
             name: name.value,
             email: email.value,
@@ -104,7 +105,7 @@ document.getElementById('signInForm').addEventListener('submit', function (e) {
                 localStorage.setItem('accounts', JSON.stringify(existingAccounts));
             }
 
-            window.location.href = 'Yoyo.html';
+            // window.location.href = 'Yoyo.html';
 
 
 

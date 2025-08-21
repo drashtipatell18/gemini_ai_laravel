@@ -9,3 +9,4 @@ Route::get('/', function () {
 
 
 Route::get('index', [HomeController::class, 'index'])->name('index');
+Route::get('upgrade', [HomeController::class, 'Upgrade'])->name('upgrade');

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>YOYO</title>
+    <title>@yield('title', 'Gemini AI')</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
         integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -187,7 +187,7 @@
                                             features</div>
                                     </div>
                                     <div class="pl-5">
-                                        <a href=""
+                                        <a href="{{ route('upgrade') }}"
                                             class="h-9 rounded-full justify-center flex items-center text-sm  w-[100px]"
                                             style="background-color: var(--sidebar-hover); color: var(--accent-blue);">
                                             Upgrade
@@ -200,7 +200,7 @@
                 </div>
 
                 <div class="flex space-x-2 items-center">
-                    <a href=""
+                    <a href="{{ route('upgrade') }}"
                         class="h-9 block cursor-pointer rounded-md flex items-center justify-center text-xs font-semibold px-6 mr-3"
                         style="background-color: var(--sidebar-hover);">
                         

@@ -1,6 +1,6 @@
 @extends('layouts.main')
+@section('title',  'Gemini AI')
 @section('content')
-
         <div class="gemini-data gemini-container gemini-main">
             <div class="main-chat-area">
                 <div class="chat-content-wrapper gemini-chat-content-wrapper" style="background-color: var(--bg-main);">

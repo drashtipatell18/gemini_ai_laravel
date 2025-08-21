@@ -10,4 +10,9 @@ class HomeController extends Controller
     {
         return view('yoyo');
     }
+
+    public function Upgrade()
+    {
+        return view('Upgrad');
+    }
 }

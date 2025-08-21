@@ -74,6 +74,7 @@ document.getElementById('loginForm').addEventListener('submit', function (e) {
             return response.json();
         })
         .then(data => {
+                localStorage.setItem('user', JSON.stringify(data));
             // Success - redirect to dashboard
             window.location.href = `${getBaseUrl()}`;
         })

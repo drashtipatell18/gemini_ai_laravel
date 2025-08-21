@@ -54,7 +54,7 @@ class LoginController extends Controller
         auth()->login($user);
 
         // Redirect to dashboard or intended page
-        return redirect()->route('index')->with('success', 'Account created successfully.');
+        return response()->json(['message' => 'User registered successfully']);
     }
 
 }

@@ -76,18 +76,18 @@ document.getElementById('signInForm').addEventListener('submit', function (e) {
     if (!isValid) return;
 
     // Submit if all valid
-   fetch('http://127.0.0.1:8000/signupStore', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-  
-        body: JSON.stringify({
-            name: name.value,
-            email: email.value,
-            password: password.value
+        fetch('http://127.0.0.1:8000/signupStore', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                name: name.value,
+                email: email.value,
+                password: password.value
+            })
         })
-    })
         .then(() => {
             const newUser = {
                 name: name.value,
@@ -105,7 +105,7 @@ document.getElementById('signInForm').addEventListener('submit', function (e) {
                 localStorage.setItem('accounts', JSON.stringify(existingAccounts));
             }
 
-            // window.location.href = 'Yoyo.html';
+            window.location.href = '/';
 
 
 
